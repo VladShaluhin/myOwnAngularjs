@@ -1,7 +1,5 @@
 describe("Hello", function() {
-
-  it ("says hello", function () 
+  it ("say hello", function() {
     expect(sayHello()).toBe("Hello, world!");
   });
-
 });
