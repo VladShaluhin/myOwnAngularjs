@@ -17,9 +17,13 @@ Scope.prototype.$watch = function(watchFn,  listenerFn) {
 };
 
 Scope.prototype.$digest = function(){
+  var ttl = 10; //Time To Live
   var dirty;
   do {
     dirty = this.$$digestOnce();
+    if(dirty && !(ttl--)) {
+      throw "10 digest iterations reached";
+    }
   } while(dirty);
 };
 
