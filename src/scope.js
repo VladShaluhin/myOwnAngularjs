@@ -30,10 +30,10 @@ Scope.prototype.$digest = function(){
       this.$eval(asyncTask.expression);
     }
     dirty = this.$$digestOnce();
-    if(dirty && !(ttl--)) {
+    if((dirty || this.$$asyncQueue.length) && !(ttl--)) {
       throw "10 digest iterations reached";
     }
-  } while(dirty);
+  } while(dirty || this.$$asyncQueue.length);
 };
 
 Scope.prototype.$apply = function(expr) {
