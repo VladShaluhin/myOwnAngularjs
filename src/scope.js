@@ -29,11 +29,22 @@ Scope.prototype.$new = function(isolated, parent) {
     ChildScope.prototype = this;
     child = new ChildScope();
   }
-
   parent.$$children.push(child);
   child.$$watchers = [];
   child.$$children = [];
+  child.$parent = parent;
   return child;
+};
+
+Scope.prototype.$destroy = function() {
+  if (this.$root === this) {
+    return;
+  }
+  var siblings = this.$parent.$$children;
+  var indexOfThis = siblings.indexOf(this);
+  if (indexOfThis >= 0) {
+    siblings.splice(indexOfThis, 1);
+  }
 };
 
 Scope.prototype.$watch = function(watchFn,  listenerFn, valueEq) {
