@@ -188,6 +188,98 @@ Scope.prototype.$watchGroup = function(watchFns, listenerFn) {
   };
 };
 
+Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
+  var self = this;
+  var newValue;
+  var oldValue;
+  var oldLength;
+  var veryOldValue;
+  var trackVeryOldValue = (listenerFn.length > 1);
+  var changeCounter = 0;
+  var firstRun = true;
+
+  var internalWatchFn = function(scope) {
+    var newLength;
+    newValue = watchFn(scope);
+
+    if(_.isObject(newValue)) {
+      if (_.isArrayLike(newValue)) {
+        if (!_.isArray(oldValue)) {
+          changeCounter++;
+          oldValue = [];
+        }
+
+        if (newValue.length !== oldValue.length) {
+          changeCounter++;
+          oldValue.length = newValue.length;
+        }
+
+        _.forEach(newValue, function(newItem, i) {
+          if (!self.$$areEqual(newItem, oldValue[i], false)) {
+            changeCounter++;
+            oldValue[i] = newItem;
+          }
+        });
+
+      } else {
+        if (!_.isObject(oldValue) || _.isArrayLike(oldValue)) {
+          changeCounter++;
+          oldValue = {};
+          oldLength = 0;
+        }
+        newLength = 0;
+        _.forOwn(newValue, function(newItem, key) {
+          newLength++;
+          if(oldValue.hasOwnProperty(key)) {
+            if (!self.$$areEqual(newItem, oldValue[key], false)) {
+              changeCounter++;
+              oldValue[key] = newItem;
+            }
+          } else {
+            changeCounter++;
+            oldLength++;
+            oldValue[key] = newItem;
+          }
+        });
+
+        if (oldLength > newLength) {
+            changeCounter++;
+          _.forOwn(oldValue, function(newItem, key) {
+            if (!newValue.hasOwnProperty(key)) {
+              oldLength--;
+              delete oldValue[key];
+            }
+          });
+        }
+      }
+
+    } else {
+      if (!self.$$areEqual(newValue, oldValue, false)) {
+        changeCounter++;
+      }
+      oldValue = newValue;
+    }
+
+
+    return changeCounter;
+  };
+
+  var internalListenerFn = function() {
+    if (firstRun) {
+      listenerFn(newValue, newValue, self);
+      firstRun = false;
+    } else {
+      listenerFn(newValue, veryOldValue, self);
+    }
+
+    if (trackVeryOldValue) {
+      veryOldValue = _.clone(newValue);
+    }
+  };
+
+  return this.$watch(internalWatchFn, internalListenerFn);
+};
+
 Scope.prototype.$beginPhase = function(phase) {
   if(this.$$phase) {
     throw this.$$phase + ' already in progress';
