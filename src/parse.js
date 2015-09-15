@@ -374,7 +374,6 @@ Parser.ZERO = _.extend(_.constant(0), {constant: true});
 Parser.prototype.parse = function(expr) {
   this.tokens = this.laxer.lex(expr);
   var tokens = JSON.parse(JSON.stringify(this.tokens));
-  console.log(tokens);
   return this.assigment();
 };
 
@@ -416,7 +415,7 @@ Parser.prototype.unary = function() {
   var operator;
   var operand;
   if (this.expect('+')) {
-    return this.expect();
+    return this.primary();
   } else if((operator = this.expect('!'))) {
     operand = this.unary();
     var unaryFn = function(scope, locals) {
