@@ -1,6 +1,5 @@
-/* jshint globalstrict: true */
-/* global angular: false */
 'use strict';
+var _ = require('lodash');
 
 var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
 var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
@@ -120,7 +119,7 @@ function createInjector(modulesToLoad, strictDi) {
 	_.forEach(modulesToLoad, function loadModule (moduleName) {
 		if (!loadedModules.hasOwnProperty(moduleName)) {
 			loadedModules[moduleName] = true;
-			var module = angular.module(moduleName);
+			var module = window.angular.module(moduleName);
 			_.forEach(module.requires, loadModule);
 			_.forEach(module._invokeQueue, function(invokeArgs) {
 				var method = invokeArgs[0];
@@ -134,4 +133,4 @@ function createInjector(modulesToLoad, strictDi) {
 }
 
 
-	
+module.exports = createInjector;

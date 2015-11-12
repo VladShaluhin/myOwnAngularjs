@@ -1,6 +1,7 @@
-/* jshint globalstrict: true */
-/* global setupModuleLoader: false */
 'use strict';
+
+var setupModuleLoader = require('../src/loader');
+
 describe('setupModuleLoader', function() {
 	beforeEach(function() {
 		delete window.angular;

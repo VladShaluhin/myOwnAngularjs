@@ -1,5 +1,6 @@
-/* jshint globalstrict: true */
 'use strict';
+
+var _ = require('lodash');
 
 var EXCAPES = {
   'n' : '\n',
@@ -201,37 +202,6 @@ var generatedGetterFn = function(keys) {
   return new Function('scope', 'locals', code);
   /* jshint +W054 */
 };
-
-function parse(expr) {
-  switch (typeof expr) {
-    case 'string':
-      var laxer = new Lexer();
-      var parser = new Parser(laxer);
-      var oneTime = false;
-
-      if (expr.charAt(0) === ':' && expr.charAt(1) === ':') {
-        oneTime = true;
-        expr = expr.substring(2);
-      }
-
-      var parseFn = parser.parse(expr);
-
-      if (parseFn.constant) {
-        parseFn.$$watchDelegate = constantWatchDelegate;
-      } else if (oneTime) {
-        parseFn = wrapSharedExpression(parseFn);
-        parseFn.$$watchDelegate = parseFn.literal ? oneTimeLiteralWatchDelegate : oneTimeWatchDelegate;
-      } else if (parseFn.inputs) {
-        parseFn.$$watchDelegate = inputsWatchDelegate;
-      }
-
-      return parseFn;
-    case 'function':
-      return expr;
-    default:
-      return _.noop;
-  }
-}
 
 function constantWatchDelegate(scope, listenerFn, valueEq, watchFn) {
   var unwatch = scope.$watch(function(){
@@ -883,3 +853,36 @@ Parser.prototype.peek = function(e1, e2, e3, e4) {
     }
   }
 };
+
+function parse(expr) {
+  switch (typeof expr) {
+    case 'string':
+      var laxer = new Lexer();
+      var parser = new Parser(laxer);
+      var oneTime = false;
+
+      if (expr.charAt(0) === ':' && expr.charAt(1) === ':') {
+        oneTime = true;
+        expr = expr.substring(2);
+      }
+
+      var parseFn = parser.parse(expr);
+
+      if (parseFn.constant) {
+        parseFn.$$watchDelegate = constantWatchDelegate;
+      } else if (oneTime) {
+        parseFn = wrapSharedExpression(parseFn);
+        parseFn.$$watchDelegate = parseFn.literal ? oneTimeLiteralWatchDelegate : oneTimeWatchDelegate;
+      } else if (parseFn.inputs) {
+        parseFn.$$watchDelegate = inputsWatchDelegate;
+      }
+
+      return parseFn;
+    case 'function':
+      return expr;
+    default:
+      return _.noop;
+  }
+}
+
+module.exports = parse;

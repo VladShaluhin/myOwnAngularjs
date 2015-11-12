@@ -1,7 +1,8 @@
-/* jshint globalstrict: true */
-/* global Scope: false */
-/* global parse: false */
 'use strict';
+
+var _ = require('lodash');
+var Scope = require('../src/scope');
+var createInjector = require('../src/injector');
 
 describe("Scope", function() {
 

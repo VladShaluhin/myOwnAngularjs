@@ -1,6 +1,8 @@
-/* jshint globalstrict: true */
-/* global parse: false */
 'use strict';
+
+var _ = require('lodash');
+var parse = require('../src/parse');
+var createInjector = require('../src/injector');
 
 describe("parse", function() {
 	it("can parse an integer", function() {

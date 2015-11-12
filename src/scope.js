@@ -1,6 +1,17 @@
-/* jshint globalstrict: true */
 /* global parse: false */
 'use strict';
+
+var _ = require('lodash');
+var parse = require('./parse');
+
+function isArrayLike(obj) {
+  if (_.isNull(obj) || _.isUndefined(obj)) {
+    return false;
+  }
+  var length = obj.length;
+  return length === 0 ||
+    (_.isNumber(length) && length > 0 && (length - 1) in obj);
+}
 
 function Scope() {
 	this.$$watchers = [];
@@ -216,7 +227,7 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
 		newValue = watchFn(scope);
 
 		if(_.isObject(newValue)) {
-			if (_.isArrayLike(newValue)) {
+			if (isArrayLike(newValue)) {
 				if (!_.isArray(oldValue)) {
 					changeCounter++;
 					oldValue = [];
@@ -235,7 +246,7 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
 				});
 
 			} else {
-				if (!_.isObject(oldValue) || _.isArrayLike(oldValue)) {
+				if (!_.isObject(oldValue) || isArrayLike(oldValue)) {
 					changeCounter++;
 					oldValue = {};
 					oldLength = 0;
@@ -452,3 +463,4 @@ Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
 };
 
 
+module.exports = Scope;

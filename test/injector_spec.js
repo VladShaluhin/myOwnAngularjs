@@ -1,6 +1,9 @@
-/* jshint globalstrict: true */
-/* global createInjector: false, setupModuleLoader: false, angular: false */
 'use strict';
+
+var _ = require('lodash');
+var setupModuleLoader = require('../src/loader');
+var createInjector = require('../src/injector');
+
 describe('injector', function() {
 	beforeEach(function() {
 		delete window.angular;

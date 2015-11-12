@@ -1,4 +1,3 @@
-/* jshint globalstrict: true */
 'use strict';
 function setupModuleLoader(window) {
 	var ensure = function(obj, name, factory) {
@@ -53,3 +52,5 @@ function setupModuleLoader(window) {
 		};
 	});
 }
+
+module.exports = setupModuleLoader;
